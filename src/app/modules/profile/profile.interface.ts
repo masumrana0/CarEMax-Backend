@@ -6,4 +6,5 @@ export type IProfile = {
   name?: string;
   contactNo?: string;
   profilePhoto?: string;
+  isVerified?:string
 };

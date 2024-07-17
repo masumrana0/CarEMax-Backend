@@ -5,11 +5,13 @@ export type IUser = {
   _id?: string;
   name: string;
   role?: 'customer' | 'admin' | 'super_admin';
+  accountType?: 'personal' | 'business';
+  documents?: string[];
+  balance: number;
   password: string;
   email: string;
   passwordChangedAt?: Date;
   isEmailVerified: boolean;
-  profileImage?: string;
 };
 
 export type UserModel = {

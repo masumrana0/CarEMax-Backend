@@ -18,6 +18,10 @@ const profileSchema = new Schema<IProfile>(
     profilePhoto: {
       type: String,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

@@ -6,8 +6,6 @@
  *
  */
 
-import httpStatus from 'http-status';
-import ApiError from '../../../../errors/ApiError';
 import { IUser } from '../../user/user.interface';
 import { User } from '../../user/user.model';
 import { IDataValidationResponse, ILoginUserResponse } from '../auth.interface';
@@ -15,7 +13,6 @@ import { AuthService } from '../auth.service';
 import validationResponse from '../../../../shared/validationResponse';
 import { startSession } from 'mongoose';
 import { ProfileService } from '../../profile/profile.service';
-import { convertHashPassword } from '../../../../helper/passwordSecurityHelper';
 
 // customer registration
 const customerRegistration = async (
@@ -23,8 +20,7 @@ const customerRegistration = async (
 ): Promise<ILoginUserResponse | IDataValidationResponse> => {
   payload.role = 'customer';
 
-  const { name, password, ...userData } = payload;
-  const hashedPassword =await convertHashPassword(password);
+  const { name, ...userData } = payload;
 
   const isNotUniqueEmail = await User.isUserExist(payload.email);
   if (isNotUniqueEmail) {
@@ -40,22 +36,17 @@ const customerRegistration = async (
 
   try {
     // Create User
-    const user = await User.create({ ...userData, password: hashedPassword });
-    if (!user) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Something is wrong');
-    }
+    const user = await User.create({ ...userData });
+
     await AuthService.sendVerificationEmail({ email: user?.email });
 
     // Create Profile
     await ProfileService.updateProfile(user?._id, { name: name });
 
     // Login User
-    const loginData = { email: userData?.email, password: password };
-    const token = await AuthService.userLogin(loginData);
-    console.log('token form customer service',token)
-
-    return token;
-    
+    const loginData = { email: userData?.email, password: userData.password };
+    const result = await AuthService.userLogin(loginData);
+    return result;
 
     // Commit the transaction
     await session.commitTransaction();

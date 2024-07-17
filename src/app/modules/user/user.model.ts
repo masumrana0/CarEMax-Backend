@@ -10,12 +10,36 @@ import { Schema, model } from 'mongoose';
 import { IUser, UserModel } from './user.interface';
 import { userRole } from './user.constant';
 import bcrypt from 'bcrypt';
+import { convertHashPassword } from '../../../helper/passwordSecurityHelper';
 
 const UserSchema = new Schema<IUser, UserModel>(
   {
+    name: {
+      type: String,
+      required: true,
+    },
     role: {
       type: String,
       enum: userRole,
+      default: 'customer',
+    },
+    accountType: {
+      type: String,
+      enum: ['personal', 'business'],
+      required: function () {
+        return this.role === 'customer';
+      },
+    },
+    documents: {
+      type: [String],
+    },
+    balance: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    password: {
+      type: String,
       required: true,
     },
     email: {
@@ -23,20 +47,16 @@ const UserSchema = new Schema<IUser, UserModel>(
       required: true,
       unique: true,
     },
-    password: {
-      type: String,
-      required: true,
-      select: 0,
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-    },
-
     passwordChangedAt: {
       type: Date,
     },
+    isEmailVerified: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
+
   {
     timestamps: true,
     toJSON: {
@@ -45,17 +65,11 @@ const UserSchema = new Schema<IUser, UserModel>(
   },
 );
 
-// UserSchema.pre('save', async function (next) {
-//   // hasning user password
-//   this.password = await bcrypt.hash(
-//     this.password,
-//     Number(config.bcrypt_salt_rounds),
-//   );
-//   if (this.isPasswordChanged) {
-//     this.passwordChangedAt = new Date();
-//   }
-//   next();
-// });
+UserSchema.pre('save', async function (next) {
+  // hasning user password
+  this.password = await convertHashPassword(this.password);
+  next();
+});
 
 // checking isUserExist
 UserSchema.statics.isUserExist = async function (
@@ -63,7 +77,14 @@ UserSchema.statics.isUserExist = async function (
 ): Promise<IUser | null> {
   return await User.findOne(
     { email: email },
-    { _id: 1, password: 1, role: 1, email: 1, isEmailVerified: 1 },
+    {
+      _id: 1,
+      password: 1,
+      role: 1,
+      accountType: 1,
+      email: 1,
+      isEmailVerified: 1,
+    },
   );
 };
 
