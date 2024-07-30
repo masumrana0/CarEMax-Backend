@@ -1,17 +1,17 @@
-"use client";
-import { useTheme } from "@/components/darkmode";
-import LoadingSpinner from "@/components/shared/lodingspinner";
-import { useForgotPasswordMutation } from "@/Redux/api/authApi";
-import React, { useState } from "react";
-import toast from "react-hot-toast";
+'use client';
+import { useTheme } from '@/components/darkmode';
+import LoadingSpinner from '@/components/shared/lodingspinner';
+import { useForgotPasswordMutation } from '@/Redux/api/authApi';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const ForgotPassword: React.FC = () => {
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
   useTheme();
-  const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState<string>('');
   const [isError, setIsError] = useState<boolean>(false);
   const [validationMessage, setValidationMessage] = useState<string | null>(
-    null
+    null,
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,14 +22,14 @@ const ForgotPassword: React.FC = () => {
       email: email,
     }).unwrap();
 
-    if (res && "validationResponse" in res) {
+    if (res && 'validationResponse' in res) {
       setIsError(true);
       setValidationMessage(res?.validationResponse?.message);
     } else {
       setValidationMessage(
-        "If this email is registered, a reset link has been sent."
+        'If this email is registered, a reset link has been sent.',
       );
-      toast.success("Please check your email inbox");
+      toast.success('Please check your email inbox');
     }
   };
 
@@ -56,8 +56,8 @@ const ForgotPassword: React.FC = () => {
           <div
             className={`p-4 mb-4 border-l-4 ${
               isError
-                ? "bg-red-100 border-red-500 text-red-700"
-                : "bg-green-100 border-green-500 text-green-700"
+                ? 'bg-red-100 border-red-500 text-red-700'
+                : 'bg-green-100 border-green-500 text-green-700'
             }`}
           >
             {validationMessage}
@@ -75,7 +75,7 @@ const ForgotPassword: React.FC = () => {
               type="email"
               id="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline light-darkmode"
               required
             />
