@@ -8,10 +8,9 @@
 
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
-import { Secret } from 'jsonwebtoken';
+import config from '../../config';
 import ApiError from '../../errors/ApiError';
 import { jwtHelpers } from '../../helper/jwtHelpers';
-import config from '../../config';
 
 const auth =
   (...requiredRoles: string[]) =>
@@ -28,7 +27,7 @@ const auth =
 
       verifiedUser = jwtHelpers.verifyToken(
         token,
-        config.accessTokenSecret as Secret,
+        config.jwt.accessTokenSecret as string,
       );
 
       req.user = verifiedUser; // role userId

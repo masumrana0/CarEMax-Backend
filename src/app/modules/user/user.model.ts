@@ -1,6 +1,6 @@
 /**
- * Title: 'user Schema'
- * Description: 'handle user Schema.and createing User Schema and  other fucntionalities'
+ * Title: 'User Schema'
+ * Description: 'Handle User Schema and create User Schema and other functionalities'
  * Author: 'Masum Rana'
  * Date: 29-12-2023
  *
@@ -14,10 +14,6 @@ import { convertHashPassword } from '../../../helper/passwordSecurityHelper';
 
 const UserSchema = new Schema<IUser, UserModel>(
   {
-    name: {
-      type: String,
-      required: true,
-    },
     role: {
       type: String,
       enum: userRole,
@@ -30,9 +26,12 @@ const UserSchema = new Schema<IUser, UserModel>(
         return this.role === 'customer';
       },
     },
-    documents: {
-      type: [String],
+    membership: {
+      type: String,
+      enum: ['free', 'paid'],
+      default: 'free',
     },
+
     balance: {
       type: Number,
       required: true,
@@ -41,6 +40,7 @@ const UserSchema = new Schema<IUser, UserModel>(
     password: {
       type: String,
       required: true,
+      select: 0,
     },
     email: {
       type: String,
@@ -56,7 +56,6 @@ const UserSchema = new Schema<IUser, UserModel>(
       default: false,
     },
   },
-
   {
     timestamps: true,
     toJSON: {
@@ -65,17 +64,19 @@ const UserSchema = new Schema<IUser, UserModel>(
   },
 );
 
+// Pre-save middleware to hash the password
 UserSchema.pre('save', async function (next) {
-  // hasning user password
-  this.password = await convertHashPassword(this.password);
+  if (this.isModified('password')) {
+    this.password = await convertHashPassword(this.password);
+  }
   next();
 });
 
-// checking isUserExist
+// Static method to check if a user exists by email
 UserSchema.statics.isUserExist = async function (
   email: string,
 ): Promise<IUser | null> {
-  return await User.findOne(
+  return await this.findOne(
     { email: email },
     {
       _id: 1,
@@ -88,7 +89,7 @@ UserSchema.statics.isUserExist = async function (
   );
 };
 
-//password Matching
+// Static method to compare passwords
 UserSchema.statics.isPasswordMatched = async function (
   givenPassword: string,
   savedPassword: string,

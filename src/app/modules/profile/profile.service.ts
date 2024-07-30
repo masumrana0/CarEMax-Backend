@@ -4,6 +4,7 @@ import { Profile } from './profile.model';
 // Get Profile
 const getProfile = async (id: string): Promise<IProfile | null> => {
   const result = await Profile.findOne({ user: id }).populate('user');
+
   return result;
 };
 

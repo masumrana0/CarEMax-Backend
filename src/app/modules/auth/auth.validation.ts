@@ -24,6 +24,8 @@ const userLoginZodSchema = z.object({
 const customerRegisterZodSchema = z.object({
   body: z.object({
     name: z.string(),
+    accountType: z.string({ required_error: 'AccountType is required' }),
+    contactNo: z.string({ required_error: 'contactNo is required' }),
     email: z.string().email(),
     password: z.string(),
   }),

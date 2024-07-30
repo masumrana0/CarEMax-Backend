@@ -7,7 +7,9 @@ export type IUser = {
   role?: 'customer' | 'admin' | 'super_admin';
   accountType?: 'personal' | 'business';
   documents?: string[];
-  balance: number;
+  membership?: 'free' | 'faid';
+  contactNo?: string;
+  balance?: number;
   password: string;
   email: string;
   passwordChangedAt?: Date;

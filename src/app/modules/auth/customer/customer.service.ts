@@ -20,7 +20,7 @@ const customerRegistration = async (
 ): Promise<ILoginUserResponse | IDataValidationResponse> => {
   payload.role = 'customer';
 
-  const { name, ...userData } = payload;
+  const { name, contactNo, ...userData } = payload;
 
   const isNotUniqueEmail = await User.isUserExist(payload.email);
   if (isNotUniqueEmail) {
@@ -38,10 +38,16 @@ const customerRegistration = async (
     // Create User
     const user = await User.create({ ...userData });
 
-    await AuthService.sendVerificationEmail({ email: user?.email });
-
     // Create Profile
-    await ProfileService.updateProfile(user?._id, { name: name });
+    const profile = await ProfileService.updateProfile(user?._id, {
+      name: name,
+      contactNo: contactNo,
+    });
+
+    await AuthService.sendVerificationEmail({
+      email: user?.email,
+      name: profile?.name as string,
+    });
 
     // Login User
     const loginData = { email: userData?.email, password: userData.password };

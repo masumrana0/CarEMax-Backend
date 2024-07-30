@@ -1,24 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
-import { User } from '../user/user.model';
 import { JwtPayload, Secret } from 'jsonwebtoken';
-import {
-  IDataValidationResponse,
-  IChangePassword,
-  ILoginUser,
-  ILoginUserResponse,
-  IRefreshTokenResponse,
-  IForgetPassword,
-} from './auth.interface';
+import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helper/jwtHelpers';
-import config from '../../../config';
-import { sendMailerHelper } from '../../../helper/sendMailHelper';
-import validationResponse from '../../../shared/validationResponse';
 import {
   convertHashPassword,
   verifyPassword,
 } from '../../../helper/passwordSecurityHelper';
+import { sendMailerHelper } from '../../../helper/sendMailHelper';
+import validationResponse from '../../../shared/validationResponse';
+import { User } from '../user/user.model';
+import {
+  IChangePassword,
+  IDataValidationResponse,
+  IForgetPassword,
+  ILoginUser,
+  ILoginUserResponse,
+  IRefreshTokenResponse,
+} from './auth.interface';
 
 // login user
 const userLogin = async (
@@ -46,7 +46,7 @@ const userLogin = async (
   // create accessToken
   const accessToken = jwtHelpers.createToken(
     {
-      userid: _id,
+      userId: _id,
       role: role,
       email: Email,
     },
@@ -57,7 +57,7 @@ const userLogin = async (
   // create refreshToken
   const refreshToken = jwtHelpers.createToken(
     {
-      userid: _id,
+      userId: _id,
       role: role,
       email: Email,
     },
@@ -156,6 +156,7 @@ const changePassword = async (
 // send verification email
 const sendVerificationEmail = async (payload: {
   email: string;
+  name?: string;
 }): Promise<any | IDataValidationResponse> => {
   const { email } = payload;
 
@@ -165,6 +166,8 @@ const sendVerificationEmail = async (payload: {
   if (!isUserExist) {
     return validationResponse('this user does not exist.');
   }
+
+  const currentYear = new Date().getFullYear();
 
   const passVerificationToken = jwtHelpers.createResetToken(
     { userId: isUserExist._id, email: isUserExist.email },
@@ -176,7 +179,7 @@ const sendVerificationEmail = async (payload: {
 
   const mailInfo = {
     to: email,
-    subject: 'Secure Your Account: Verify Your Password Account',
+    subject: 'Secure Your Account: Verify Your Account',
     html: `
     <!DOCTYPE html>
 <html>
@@ -232,19 +235,19 @@ const sendVerificationEmail = async (payload: {
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://yourapp.com/logo.png" alt="Your App Logo">
+            <img src="../../../../public/assets/logo.png" alt="Logo">
         </div>
         <div class="content">
             <h2>Verify Your Email Address</h2>
-            <p>Hi [User's Name],</p>
+            <p>Hi ${payload?.name},</p>
             <p>Thank you for signing up for [Your App Name]! To complete your registration, please verify your email address by clicking the button below:</p>
             <a  href="${verificationlink}" class="button">Verify Email</a>
-            <p>If you did not sign up for this account, you can ignore this email.</p>
+           
             <p>Thank you,</p>
-            <p>The [Your App Name] Team</p>
+            <p>The FreeFexiPlan Team</p>
         </div>
         <div class="footer">
-            <p>&copy; [Current Year] [Your App Name]. All rights reserved.</p>
+            <p>&copy; ${currentYear}  FreeFexiPlan. All rights reserved.</p>
         </div>
     </div>
 </body>

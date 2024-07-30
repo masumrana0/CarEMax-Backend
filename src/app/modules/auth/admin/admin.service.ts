@@ -8,7 +8,7 @@
 
 import { IUser } from '../../user/user.interface';
 import { User } from '../../user/user.model';
-import { IDataValidationResponse, ILoginUserResponse } from '../auth.interface';
+import { IDataValidationResponse } from '../auth.interface';
 import { AuthService } from '../auth.service';
 import validationResponse from '../../../../shared/validationResponse';
 import { startSession } from 'mongoose';
@@ -17,7 +17,7 @@ import { ProfileService } from '../../profile/profile.service';
 // user registration
 const adminRegistration = async (
   payload: IUser,
-): Promise<IUser | IDataValidationResponse | > => {
+): Promise<IUser | IDataValidationResponse> => {
   payload.role = 'customer';
 
   const { name, ...userData } = payload;
