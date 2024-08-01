@@ -16,7 +16,11 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: ['http://localhost:3000'],
+    origin: [
+      'http://localhost:3000',
+      'https://freeflexiplan.vercel.app',
+      'https://www.freeflexiplan.com',
+    ],
     credentials: true,
   }),
 );

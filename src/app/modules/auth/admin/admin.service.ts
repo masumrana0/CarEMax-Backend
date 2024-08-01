@@ -18,8 +18,6 @@ import { ProfileService } from '../../profile/profile.service';
 const adminRegistration = async (
   payload: IUser,
 ): Promise<IUser | IDataValidationResponse> => {
-  payload.role = 'customer';
-
   const { name, ...userData } = payload;
 
   const isNotUniqueEmail = await User.isUserExist(payload.email);

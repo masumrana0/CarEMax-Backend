@@ -1,11 +1,12 @@
 import express from 'express';
 import { AdminRoutes } from '../modules/auth/admin/admin.route';
-import { CustomerthRoutes } from '../modules/auth/customer/customer.route';
 import { AuthRoutes } from '../modules/auth/auth.route';
-import { FeedBackRoutes } from '../modules/Feedback/feedback.route';
+import { CustomerthRoutes } from '../modules/auth/customer/customer.route';
+import { FQARoutes } from '../modules/FQA/fqa.route';
 import { ProfileRoutes } from '../modules/profile/profile.route';
 import { UserRoutes } from '../modules/user/user.route';
-import { FQARoutes } from '../modules/FQA/fqa.route';
+import { headerCarouselSliderRoute } from '../modules/web-content/headerCarousel/headerCarousel.route';
+import { offerRoute } from '../modules/offer/offer.route';
 
 const router = express.Router();
 
@@ -23,8 +24,12 @@ const moduleRoutes = [
     route: AdminRoutes,
   },
   {
-    path: '/feedback',
-    route: FeedBackRoutes,
+    path: '/web-content/headercarousel',
+    route: headerCarouselSliderRoute,
+  },
+  {
+    path: '/offer',
+    route: offerRoute,
   },
   {
     path: '/profile',

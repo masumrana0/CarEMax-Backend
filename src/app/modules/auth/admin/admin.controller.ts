@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../../../shared/catchAsync';
 import sendResponse from '../../../../shared/sendResponse';
-import { IDataValidationResponse, ILoginUserResponse } from '../auth.interface';
+import { IDataValidationResponse } from '../auth.interface';
 import { AdminService } from './admin.service';
 import { IUser } from '../../user/user.interface';
 
@@ -17,10 +17,10 @@ const adminRegistration = catchAsync(async (req: Request, res: Response) => {
       statusCode: httpStatus.OK,
       success: false,
       message: 'Validation response',
-      data: result,
+      data: result as IDataValidationResponse,
     });
   } else {
-    sendResponse<ILoginUserResponse>(res, {
+    sendResponse<IUser>(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: 'admin Registration  successfully !',
