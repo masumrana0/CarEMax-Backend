@@ -19,7 +19,7 @@ const getAllOffers = async (): Promise<IOffer[] | null> => {
   return result;
 };
 
-// Update an offer by ID
+// Update an offer
 const updateOffer = async (
   id: string,
   payload: Partial<IOffer>,
@@ -31,7 +31,7 @@ const updateOffer = async (
   return result;
 };
 
-// Delete an offer by ID
+// Delete an offer
 const deleteOffer = async (id: string): Promise<IOffer | null> => {
   const result = await Offer.findByIdAndDelete(id);
   return result;
