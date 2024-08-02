@@ -8,7 +8,6 @@ import sendResponse from '../../../shared/sendResponse';
 // Create Offer
 const createOffer = catchAsync(async (req: Request, res: Response) => {
   const { ...offerData } = req.body;
-  console.log('i am from controller', offerData);
 
   const result = await offerService.createOffer(offerData);
   sendResponse<IOffer>(res, {

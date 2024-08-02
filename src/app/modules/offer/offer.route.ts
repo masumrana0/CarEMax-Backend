@@ -14,11 +14,7 @@ router.post(
 );
 
 // Get all offers
-router.get(
-  '/',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  offerController.getAllOffers,
-);
+router.get('/', offerController.getAllOffers);
 
 // Get offer by ID
 router.get(
