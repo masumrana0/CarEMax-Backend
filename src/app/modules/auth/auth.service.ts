@@ -21,15 +21,16 @@ import {
 } from './auth.interface';
 
 // login user
-const userLogin = async (
-  payload: ILoginUser,
-): Promise<ILoginUserResponse | IDataValidationResponse> => {
+const userLogin = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { email, password } = payload;
 
   // checking isUserExist
   const isUserExist = await User.isUserExist(email);
   if (!isUserExist) {
-    return validationResponse('User does not exist,Please create new account!');
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'User does not exist,Please create new account!',
+    );
   }
 
   // matching password
@@ -37,7 +38,10 @@ const userLogin = async (
     isUserExist.password &&
     !(await User.isPasswordMatched(password, isUserExist.password))
   ) {
-    return validationResponse('incorrect Password.Please try again');
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'incorrect Password.Please try again',
+    );
   }
 
   // create accessToken & refresh token

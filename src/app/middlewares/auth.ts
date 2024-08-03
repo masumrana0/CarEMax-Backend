@@ -7,10 +7,10 @@
  */
 
 import { NextFunction, Request, Response } from 'express';
-import httpStatus from 'http-status';
-import config from '../../config';
 import ApiError from '../../errors/ApiError';
 import { jwtHelpers } from '../../helper/jwtHelpers';
+import httpStatus from 'http-status';
+import config from '../../config';
 
 const auth =
   (...requiredRoles: string[]) =>

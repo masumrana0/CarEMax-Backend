@@ -8,25 +8,26 @@
 
 import { IUser } from '../../user/user.interface';
 import { User } from '../../user/user.model';
-import { IDataValidationResponse } from '../auth.interface';
 import { AuthService } from '../auth.service';
-import validationResponse from '../../../../shared/validationResponse';
 import { startSession } from 'mongoose';
 import { ProfileService } from '../../profile/profile.service';
+import ApiError from '../../../../errors/ApiError';
+import httpStatus from 'http-status';
 
 // user registration
-const adminRegistration = async (
-  payload: IUser,
-): Promise<IUser | IDataValidationResponse> => {
+const adminRegistration = async (payload: IUser): Promise<IUser> => {
   const { name, ...userData } = payload;
 
   const isNotUniqueEmail = await User.isUserExist(payload.email);
   if (isNotUniqueEmail) {
-    return validationResponse('Sorry, this email address is already in use.');
+    throw new ApiError(
+      httpStatus.CONFLICT,
+      'Sorry, this email address is already in use.',
+    );
   }
 
   if (!payload.name) {
-    return validationResponse('name is required');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'name is required');
   }
 
   const session = await startSession();

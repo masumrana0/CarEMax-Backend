@@ -18,6 +18,7 @@ app.use(
   cors({
     origin: [
       'http://localhost:3000',
+      'https://ffp-client-git-main-masumrana44s-projects.vercel.app',
       'https://freeflexiplan.vercel.app',
       'https://www.freeflexiplan.com',
     ],

@@ -17,32 +17,22 @@ const userLogin = catchAsync(async (req: Request, res: Response) => {
 
   const result = await AuthService.userLogin(loginData);
 
-  if ('validationResponse' in result) {
-    // Handle validation errors
-    sendResponse<IDataValidationResponse>(res, {
-      statusCode: httpStatus.OK,
-      success: false,
-      message: 'Validation response',
-      data: result,
-    });
-  } else {
-    const { refreshToken, accessToken, isEmailVerified } = result;
-    const responseData = { accessToken, isEmailVerified };
-    // set refresh token into cookie
-    const cookieOptions = {
-      secure: config.env === 'production',
-      httpOnly: true,
-    };
+  const { refreshToken, accessToken, isEmailVerified } = result;
+  const responseData = { accessToken, isEmailVerified };
+  // set refresh token into cookie
+  const cookieOptions = {
+    secure: config.env === 'production',
+    httpOnly: true,
+  };
 
-    res.cookie('refreshToken', refreshToken, cookieOptions);
+  res.cookie('refreshToken', refreshToken, cookieOptions);
 
-    sendResponse<ILoginUserResponse>(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'User logged in successfully!',
-      data: responseData,
-    });
-  }
+  sendResponse<ILoginUserResponse>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User logged in successfully!',
+    data: responseData,
+  });
 });
 
 // refreshToken

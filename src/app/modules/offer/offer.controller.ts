@@ -11,7 +11,7 @@ const createOffer = catchAsync(async (req: Request, res: Response) => {
 
   const result = await offerService.createOffer(offerData);
   sendResponse<IOffer>(res, {
-    statusCode: httpStatus.CREATED,
+    statusCode: httpStatus.OK,
     success: true,
     message: 'Offer created successfully!',
     data: result,
