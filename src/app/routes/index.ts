@@ -7,6 +7,7 @@ import { ProfileRoutes } from '../modules/profile/profile.route';
 import { UserRoutes } from '../modules/user/user.route';
 import { headerCarouselSliderRoute } from '../modules/web-content/headerCarousel/headerCarousel.route';
 import { offerRoute } from '../modules/offer/offer.route';
+import { productRoute } from '../modules/product/product.route';
 
 const router = express.Router();
 
@@ -30,6 +31,10 @@ const moduleRoutes = [
   {
     path: '/offer',
     route: offerRoute,
+  },
+  {
+    path: '/product',
+    route: productRoute,
   },
   {
     path: '/profile',

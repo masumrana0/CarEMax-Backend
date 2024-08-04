@@ -1,36 +1,39 @@
 import express from 'express';
-import { offerController } from './offer.controller';
+import { productController } from './product.controller';
 import auth from '../../middlewares/auth';
 import { ENUM_USER_ROLE } from '../../../enums/role';
 
 const router = express.Router();
 
-// Create Offer
+// Create Product
 router.post(
   '/',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-
-  offerController.createOffer,
+  productController.createProduct,
 );
 
-// Get all offers
-router.get('/', offerController.getAllOffers);
+// Get all products
+router.get('/', productController.getAllProducts);
 
-// Get offer by ID
-router.get('/:id', offerController.getOfferById);
+// Get product by ID
+router.get(
+  '/:id',
 
-// Update offer
+  productController.getProductById,
+);
+
+// Update product
 router.patch(
   '/:id',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  offerController.updateOffer,
+  productController.updateProduct,
 );
 
-// Delete offer
+// Delete product
 router.delete(
   '/:id',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  offerController.deleteOffer,
+  productController.deleteProduct,
 );
 
-export const offerRoute = router;
+export const productRoute = router;
