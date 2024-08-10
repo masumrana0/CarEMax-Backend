@@ -11,7 +11,6 @@ import { User } from '../../user/user.model';
 import { ILoginUserResponse } from '../auth.interface';
 import { AuthService } from '../auth.service';
 import { startSession } from 'mongoose';
-import { ProfileService } from '../../profile/profile.service';
 import ApiError from '../../../../errors/ApiError';
 import httpStatus from 'http-status';
 
@@ -20,8 +19,6 @@ const customerRegistration = async (
   payload: IUser,
 ): Promise<ILoginUserResponse> => {
   payload.role = 'customer';
-
-  const { name, contactNo, ...userData } = payload;
 
   const isNotUniqueEmail = await User.isUserExist(payload.email);
   if (isNotUniqueEmail) {
@@ -40,21 +37,15 @@ const customerRegistration = async (
 
   try {
     // Create User
-    const user = await User.create({ ...userData });
-
-    // Create Profile
-    const profile = await ProfileService.updateProfile(user?._id, {
-      name: name,
-      contactNo: contactNo,
-    });
+    const user = await User.create(payload);
 
     await AuthService.sendVerificationEmail({
       email: user?.email,
-      name: profile?.name as string,
+      name: user?.name as string,
     });
 
     // Login User
-    const loginData = { email: userData?.email, password: userData.password };
+    const loginData = { email: payload?.email, password: payload.password };
     const result = await AuthService.userLogin(loginData);
     return result;
 

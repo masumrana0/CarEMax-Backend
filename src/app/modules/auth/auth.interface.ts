@@ -6,7 +6,7 @@ export type ILoginUser = {
 export type ILoginUserResponse = {
   accessToken: string;
   refreshToken?: string;
-  isEmailVerified: boolean;
+  isEmailVerified?: boolean;
 };
 
 export type IDataValidationResponse = {

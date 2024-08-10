@@ -14,10 +14,28 @@ import { convertHashPassword } from '../../../helper/passwordSecurityHelper';
 
 const UserSchema = new Schema<IUser, UserModel>(
   {
+    name: {
+      type: String,
+      required: true,
+    },
+    contactNo: {
+      type: String,
+      required: true,
+    },
     role: {
       type: String,
       enum: userRole,
       default: 'customer',
+    },
+    password: {
+      type: String,
+      required: true,
+      select: 0,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
     accountType: {
       type: String,
@@ -37,15 +55,11 @@ const UserSchema = new Schema<IUser, UserModel>(
       required: true,
       default: 0,
     },
-    password: {
-      type: String,
-      required: true,
-      select: 0,
+    documents: {
+      type: [String],
     },
-    email: {
+    profilePhoto: {
       type: String,
-      required: true,
-      unique: true,
     },
     passwordChangedAt: {
       type: Date,
@@ -53,6 +67,10 @@ const UserSchema = new Schema<IUser, UserModel>(
     isEmailVerified: {
       type: Boolean,
       required: true,
+      default: false,
+    },
+    isVerified: {
+      type: Boolean,
       default: false,
     },
   },

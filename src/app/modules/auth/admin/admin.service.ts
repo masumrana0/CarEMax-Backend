@@ -10,14 +10,12 @@ import { IUser } from '../../user/user.interface';
 import { User } from '../../user/user.model';
 import { AuthService } from '../auth.service';
 import { startSession } from 'mongoose';
-import { ProfileService } from '../../profile/profile.service';
+
 import ApiError from '../../../../errors/ApiError';
 import httpStatus from 'http-status';
 
 // user registration
 const adminRegistration = async (payload: IUser): Promise<IUser> => {
-  const { name, ...userData } = payload;
-
   const isNotUniqueEmail = await User.isUserExist(payload.email);
   if (isNotUniqueEmail) {
     throw new ApiError(
@@ -26,21 +24,14 @@ const adminRegistration = async (payload: IUser): Promise<IUser> => {
     );
   }
 
-  if (!payload.name) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'name is required');
-  }
-
   const session = await startSession();
   session.startTransaction();
 
   try {
     // Create User
-    const user = await User.create({ ...userData });
+    const user = await User.create(payload);
 
     await AuthService.sendVerificationEmail({ email: user?.email });
-
-    // Create Profile
-    await ProfileService.updateProfile(user?._id, { name: name });
 
     // Login User
     return user;

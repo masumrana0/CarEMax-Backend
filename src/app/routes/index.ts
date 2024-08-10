@@ -3,7 +3,6 @@ import { AdminRoutes } from '../modules/auth/admin/admin.route';
 import { AuthRoutes } from '../modules/auth/auth.route';
 import { CustomerthRoutes } from '../modules/auth/customer/customer.route';
 import { FQARoutes } from '../modules/FQA/fqa.route';
-import { ProfileRoutes } from '../modules/profile/profile.route';
 import { UserRoutes } from '../modules/user/user.route';
 import { headerCarouselSliderRoute } from '../modules/web-content/headerCarousel/headerCarousel.route';
 import { offerRoute } from '../modules/offer/offer.route';
@@ -35,10 +34,6 @@ const moduleRoutes = [
   {
     path: '/product',
     route: productRoute,
-  },
-  {
-    path: '/profile',
-    route: ProfileRoutes,
   },
   {
     path: '/user',

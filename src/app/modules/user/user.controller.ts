@@ -4,15 +4,33 @@ import { IUser } from '../user/user.interface';
 import sendResponse from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
 import { UserService } from './user.service';
+import pick from '../../../shared/pick';
+import { paginationFields } from '../../../constant/pagination';
+import { userFilterableFields } from './user.constant';
+
+const createUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.createUser(req.body);
+
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'user created successfully !',
+    data: result,
+  });
+});
 
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.getAllUser();
+  const filters = pick(req.query, userFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
+
+  const result = await UserService.getAllUser(filters, paginationOptions);
 
   sendResponse<IUser[]>(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'users fatched successfully !',
-    data: result,
+    message: 'user fetched successfully !',
+    meta: result.meta,
+    data: result.data,
   });
 });
 
@@ -45,4 +63,5 @@ export const UserController = {
   getAllUser,
   getOneUser,
   updateUserByadmin,
+  createUser,
 };
