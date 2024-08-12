@@ -109,9 +109,22 @@ const updateUserByadmin = async (
   return result;
 };
 
+const deleteUser = async (id: string): Promise<void> => {
+  // Check if the user exists
+  const isExist = await User.findById(id);
+
+  if (!isExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  // Delete the user
+  await User.findByIdAndDelete(id);
+};
+
 export const UserService = {
   getAllUser,
   getOneUser,
   updateUserByadmin,
   createUser,
+  deleteUser,
 };

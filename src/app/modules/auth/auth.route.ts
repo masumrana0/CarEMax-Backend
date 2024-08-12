@@ -13,7 +13,7 @@ router.post(
   AuthController.userLogin,
 );
 
-router.get(
+router.post(
   '/get-new-accessToken',
   validateRequest(authValidationSchema.refreshTokenZodSchema),
   AuthController.getNewAccessToken,

@@ -9,6 +9,7 @@ import { paginationFields } from '../../../constant/pagination';
 import { userFilterableFields } from './user.constant';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
+  console.log(req.body);
   const result = await UserService.createUser(req.body);
 
   sendResponse<IUser>(res, {
@@ -59,9 +60,22 @@ const updateUserByadmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteUserByadmin = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  await UserService.deleteUser(id);
+
+  sendResponse<void>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'user deleted successfully !',
+    data: null,
+  });
+});
+
 export const UserController = {
   getAllUser,
   getOneUser,
   updateUserByadmin,
   createUser,
+  deleteUserByadmin,
 };

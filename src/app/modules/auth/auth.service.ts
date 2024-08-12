@@ -24,47 +24,63 @@ import {
 const userLogin = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { email, password } = payload;
 
-  // checking isUserExist
+  // Check if the user exists
   const isUserExist = await User.isUserExist(email);
   if (!isUserExist) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
-      'User does not exist,Please create new account!',
+      'User does not exist. Please create a new account!',
     );
   }
 
-  // matching password
+  // Match the password
   if (
     isUserExist.password &&
     !(await User.isPasswordMatched(password, isUserExist.password))
   ) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
-      'incorrect Password.Please try again',
+      'Incorrect password. Please try again.',
     );
   }
 
-  // create accessToken & refresh token
-  const { _id, role, email: Email, isEmailVerified } = isUserExist;
+  // Destructure user details
+  const { _id, role, email: Email, isEmailVerified, accountType } = isUserExist;
 
-  // create accessToken
+  // Create the accessToken payload
+  const accessTokenPayload: Record<string, any> = {
+    userId: _id,
+    role: role,
+    email: Email,
+  };
+
+  // Conditionally add accountType if role is 'customer'
+  if (role === 'customer') {
+    accessTokenPayload.accountType = accountType;
+  }
+
+  // Create accessToken
   const accessToken = jwtHelpers.createToken(
-    {
-      userId: _id,
-      role: role,
-      email: Email,
-    },
+    accessTokenPayload,
     config.jwt.accessTokenSecret as Secret,
     config.jwt.accessTokenExpireIn as string,
   );
 
-  // create refreshToken
+  // Create refreshToken payload
+  const refreshTokenPayload: Record<string, any> = {
+    userId: _id,
+    role: role,
+    email: Email,
+  };
+
+  // Conditionally add accountType if role is 'customer'
+  if (role === 'customer') {
+    refreshTokenPayload.accountType = accountType;
+  }
+
+  // Create refreshToken
   const refreshToken = jwtHelpers.createToken(
-    {
-      userId: _id,
-      role: role,
-      email: Email,
-    },
+    refreshTokenPayload,
     config.jwt.refreshTokenSecret as Secret,
     config.jwt.refreshTokenExpireIn as string,
   );
@@ -75,7 +91,6 @@ const userLogin = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     isEmailVerified,
   };
 };
-
 // refresh Token
 const getNewAccessToken = async (
   token: string,
@@ -244,7 +259,7 @@ const sendVerificationEmail = async (payload: {
         <div class="content">
             <h2>Verify Your Email Address</h2>
             <p>Hi ${payload?.name},</p>
-            <p>Thank you for signing up for [Your App Name]! To complete your registration, please verify your email address by clicking the button below:</p>
+            <p>Thank you for signing up. To complete your registration, please verify your email address by clicking the button below:</p>
             <a  href="${verificationlink}" class="button">Verify Email</a>
            
             <p>Thank you,</p>
