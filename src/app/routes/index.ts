@@ -2,11 +2,12 @@ import express from 'express';
 import { AdminRoutes } from '../modules/auth/admin/admin.route';
 import { AuthRoutes } from '../modules/auth/auth.route';
 import { CustomerthRoutes } from '../modules/auth/customer/customer.route';
-import { FQARoutes } from '../modules/FQA/fqa.route';
+
 import { UserRoutes } from '../modules/user/user.route';
 import { headerCarouselSliderRoute } from '../modules/web-content/headerCarousel/headerCarousel.route';
 import { offerRoute } from '../modules/offer/offer.route';
 import { productRoute } from '../modules/product/product.route';
+import { testRoute } from '../modules/FQA/fqa.route';
 
 const router = express.Router();
 
@@ -40,8 +41,8 @@ const moduleRoutes = [
     route: UserRoutes,
   },
   {
-    path: '/fqa',
-    route: FQARoutes,
+    path: '/test',
+    route: testRoute,
   },
 ];
 

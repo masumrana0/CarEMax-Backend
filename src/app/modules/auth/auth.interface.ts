@@ -24,6 +24,11 @@ export type IChangePassword = {
   newPassword: string;
 };
 
+export type IChangeEmail = {
+  password: string;
+  email: string;
+};
+
 export type IForgetPassword = {
   email: string;
 };

@@ -7,6 +7,7 @@ import { UserService } from './user.service';
 import pick from '../../../shared/pick';
 import { paginationFields } from '../../../constant/pagination';
 import { userFilterableFields } from './user.constant';
+import { IUploadFile } from '../../../inerfaces/file';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   console.log(req.body);
@@ -47,10 +48,12 @@ const getOneUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updateUserByadmin = catchAsync(async (req: Request, res: Response) => {
+const updateUser = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const { ...updatedData } = req.body;
-  const result = await UserService.updateUserByadmin(id, updatedData);
+  const data = JSON.parse(req.body?.data);
+  const file = req.file;
+
+  const result = await UserService.updateUser(id, data, file as IUploadFile);
 
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
@@ -75,7 +78,7 @@ const deleteUserByadmin = catchAsync(async (req: Request, res: Response) => {
 export const UserController = {
   getAllUser,
   getOneUser,
-  updateUserByadmin,
+  updateUser,
   createUser,
   deleteUserByadmin,
 };

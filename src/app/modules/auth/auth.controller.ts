@@ -62,23 +62,29 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
   const { ...passwordData } = req.body;
 
-  const result = await AuthService.changePassword(user, passwordData);
+  await AuthService.changePassword(user, passwordData);
 
-  if (result && 'validationResponse' in result) {
-    sendResponse<IDataValidationResponse>(res, {
-      statusCode: httpStatus.OK,
-      success: false,
-      message: 'Validation response',
-      data: result,
-    });
-  } else {
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: 'Password changed successfully !',
-      data: null,
-    });
-  }
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Password changed successfully !',
+    data: null,
+  });
+});
+
+// change password
+const changeEmail = catchAsync(async (req: Request, res: Response) => {
+  const user = req?.user;
+  const { ...data } = req.body;
+
+  const result = await AuthService.changeEmail(user, data);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Email changed successfully !',
+    data: result,
+  });
 });
 
 // ForgetPassword
@@ -180,4 +186,5 @@ export const AuthController = {
   changePassword,
   forgetPassword,
   resetPassword,
+  changeEmail,
 };

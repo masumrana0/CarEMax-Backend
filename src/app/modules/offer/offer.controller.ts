@@ -4,12 +4,20 @@ import { IOffer } from './offer.interface';
 import { offerService } from './offer.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
+import { IUploadFile } from '../../../inerfaces/file';
 
 // Create Offer
 const createOffer = catchAsync(async (req: Request, res: Response) => {
-  const { ...offerData } = req.body;
+  const data = JSON.parse(req.body.data);
+  const file = req.file;
+  const user = req.user;
 
-  const result = await offerService.createOffer(offerData);
+  const offer = {
+    user: user?.userId,
+    ...data,
+  };
+
+  const result = await offerService.createOffer(offer, file as IUploadFile);
   sendResponse<IOffer>(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -20,7 +28,29 @@ const createOffer = catchAsync(async (req: Request, res: Response) => {
 
 // Get all offers
 const getAllOffers = catchAsync(async (req: Request, res: Response) => {
-  const result = await offerService.getAllOffers();
+  const query = req.query;
+
+  const result = await offerService.getAllOffers(query?.category as string);
+  sendResponse<IOffer[]>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Offers fetched successfully!',
+    data: result,
+  });
+});
+
+// Get all offers
+const getSpecificUserOffer = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const query = req.query;
+
+  // Allow if the user role is 'admin' or the user type is 'business'
+
+  const result = await offerService.getSpecificUserOffer(
+    user?.userId as string,
+    query?.category as string,
+  );
+
   sendResponse<IOffer[]>(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -102,4 +132,5 @@ export const offerController = {
   getOfferById,
   updateOffer,
   deleteOffer,
+  getSpecificUserOffer,
 };

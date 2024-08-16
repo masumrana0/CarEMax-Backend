@@ -8,6 +8,8 @@ import { userSearchableFields } from './user.constant';
 import ApiError from '../../../errors/ApiError';
 import httpStatus from 'http-status';
 import { AuthService } from '../auth/auth.service';
+import { IUploadFile } from '../../../inerfaces/file';
+import { FileUploadHelper } from '../../../helper/FileUploadHelper';
 
 const createUser = async (payload: IUser): Promise<IUser> => {
   const isNotUniqueEmail = await User.isUserExist(payload.email);
@@ -99,11 +101,28 @@ const getOneUser = async (id: string): Promise<IUser | null> => {
   return result;
 };
 
-const updateUserByadmin = async (
+const updateUser = async (
   id: string,
-  payload: Partial<IUser>,
+  payload?: Partial<IUser>,
+  file?: IUploadFile,
 ): Promise<IUser | null> => {
-  const result = await User.findByIdAndUpdate(id, payload, {
+  const isUserExist = await User.findById(id);
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'user not found');
+  }
+  let url;
+  if (file) {
+    url = await FileUploadHelper.uploadSinleToCloudinary(file);
+  }
+
+  if (payload?.email || payload?.password) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
+  }
+  const userData = {
+    ...payload,
+    profilePhoto: url,
+  };
+  const result = await User.findByIdAndUpdate(id, userData, {
     new: true,
   });
   return result;
@@ -124,7 +143,7 @@ const deleteUser = async (id: string): Promise<void> => {
 export const UserService = {
   getAllUser,
   getOneUser,
-  updateUserByadmin,
+  updateUser,
   createUser,
   deleteUser,
 };

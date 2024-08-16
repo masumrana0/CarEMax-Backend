@@ -12,6 +12,7 @@ import { sendMailerHelper } from '../../../helper/sendMailHelper';
 import validationResponse from '../../../shared/validationResponse';
 import { User } from '../user/user.model';
 import {
+  IChangeEmail,
   IChangePassword,
   IDataValidationResponse,
   IForgetPassword,
@@ -19,6 +20,7 @@ import {
   ILoginUserResponse,
   IRefreshTokenResponse,
 } from './auth.interface';
+import { IUser } from '../user/user.interface';
 
 // login user
 const userLogin = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
@@ -137,14 +139,14 @@ const getNewAccessToken = async (
 const changePassword = async (
   user: JwtPayload | null,
   payload: IChangePassword,
-): Promise<IDataValidationResponse | any> => {
+): Promise<any> => {
   const { oldPassword, newPassword } = payload;
 
   // Find the user by ID and include the password field
   const isUserExist = await User.isUserExist(user?.email);
 
   if (!isUserExist) {
-    return validationResponse('Sorry.User does not exist');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Sorry.User does not exist');
   }
 
   // Check if the old password matches
@@ -154,7 +156,8 @@ const changePassword = async (
   );
 
   if (!isCorrectPassword) {
-    return validationResponse(
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
       'your old password is incorrect.Please try again',
     );
   }
@@ -162,16 +165,76 @@ const changePassword = async (
   const hashedNewPassword = await convertHashPassword(newPassword);
 
   // Update the user's password
-  const isUpdatePassword = await User.findByIdAndUpdate(isUserExist._id, {
+  await User.findByIdAndUpdate(isUserExist?._id, {
     password: hashedNewPassword,
   });
-
-  if (!isUpdatePassword) {
-    return validationResponse('Something is woring.Please try again');
-  }
-  // console.log(updatePassword);
 };
 
+// Change email
+const changeEmail = async (
+  user: JwtPayload | null,
+  payload: IChangeEmail,
+): Promise<IUser | null> => {
+  const { email, password } = payload;
+
+  if (user?.email === email) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'This email address is already in use. Please enter a different email.',
+    );
+  }
+
+  const isEmailExisted = await User.isUserExist(payload?.email);
+
+  if (isEmailExisted) {
+    throw new ApiError(
+      httpStatus.CONFLICT,
+      'This email address is already in use. Please enter a different email.',
+    );
+  }
+  // Fetch the user by email and include the password field
+  const existingUser = await User.isUserExist(user?.email);
+  if (!existingUser) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'User does not exist');
+  }
+
+  // Verify if the provided password matches the existing user's password
+  const isPasswordValid = await verifyPassword(
+    password,
+    existingUser?.password,
+  );
+
+  if (!isPasswordValid) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'Incorrect password. Please try again.',
+    );
+  }
+
+  // Update the user's email and reset the email verification status
+  const updatedUser = await User.findByIdAndUpdate(
+    { _id: existingUser?._id },
+    { email: email, isEmailVerified: false },
+    { new: true },
+  );
+
+  if (!updatedUser) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Failed to update email. Please try again later.',
+    );
+  }
+
+  // Send verification email to the new email address
+  await sendVerificationEmail({
+    name: updatedUser?.name,
+    email: updatedUser?.email,
+  });
+
+  return updatedUser;
+};
+
+export default changeEmail;
 // send verification email
 const sendVerificationEmail = async (payload: {
   email: string;
@@ -189,7 +252,7 @@ const sendVerificationEmail = async (payload: {
   const currentYear = new Date().getFullYear();
 
   const passVerificationToken = jwtHelpers.createResetToken(
-    { userId: isUserExist._id, email: isUserExist.email },
+    { userId: isUserExist?._id, email: isUserExist?.email },
     config.jwt.tokenSecret as string,
     '5m',
   );
@@ -300,7 +363,7 @@ const verifyEmail = async (
 
   // Update the user's password
   const setVerifiedEmail = await User.findByIdAndUpdate(
-    { userId },
+    { _id: userId },
     { isEmailVerified: true },
   );
 
@@ -449,6 +512,7 @@ const resetPassword = async (
 
 export const AuthService = {
   userLogin,
+  changeEmail,
   getNewAccessToken,
   changePassword,
   verifyEmail,

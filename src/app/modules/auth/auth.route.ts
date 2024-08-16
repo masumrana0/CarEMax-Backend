@@ -30,6 +30,16 @@ router.patch(
   AuthController.changePassword,
 );
 
+router.patch(
+  '/change-email',
+  auth(
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.CUSTOMER,
+  ),
+  AuthController.changeEmail,
+);
+
 router.post('/forget-password', AuthController.forgetPassword);
 
 router.post('/reset-password/:token', AuthController.resetPassword);
@@ -44,8 +54,8 @@ router.post(
   ),
   AuthController.sendVerificationEmail,
 );
-router.post(
-  '/verify-email',
+router.patch(
+  '/verify-email/:token',
 
   auth(
     ENUM_USER_ROLE.SUPER_ADMIN,

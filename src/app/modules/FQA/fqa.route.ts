@@ -1,15 +1,13 @@
 import express from 'express';
-import { FQAController } from './fqa.controller';
-import auth from '../../middlewares/auth';
-import { ENUM_USER_ROLE } from '../../../enums/role';
+import { testingUploadController } from './fqa.controller';
+import { FileUploadHelper } from '../../../helper/FileUploadHelper';
 
 const router = express.Router();
 
-router.get('/', FQAController.getFQA);
-
 router.post(
   '/',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  FQAController.createFQA,
+  FileUploadHelper.upload.array('file'),
+  testingUploadController.uploadFile,
 );
-export const FQARoutes = router;
+
+export const testRoute = router;
