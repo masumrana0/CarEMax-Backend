@@ -234,19 +234,18 @@ const changeEmail = async (
   return updatedUser;
 };
 
-export default changeEmail;
 // send verification email
 const sendVerificationEmail = async (payload: {
   email: string;
   name?: string;
-}): Promise<any | IDataValidationResponse> => {
-  const { email } = payload;
+}): Promise<IDataValidationResponse | void> => {
+  const { email, name } = payload;
 
   const isUserExist = await User.isUserExist(email);
 
-  // checking is user existed
+  // checking if user exists
   if (!isUserExist) {
-    return validationResponse('this user does not exist.');
+    return validationResponse('This user does not exist.');
   }
 
   const currentYear = new Date().getFullYear();
@@ -257,7 +256,9 @@ const sendVerificationEmail = async (payload: {
     '5m',
   );
 
-  const verificationlink = `${config.verify_user_url}${passVerificationToken}`;
+  const verificationlink = encodeURI(
+    `${config.verify_user_url}${passVerificationToken}`,
+  );
 
   const mailInfo = {
     to: email,
@@ -317,25 +318,24 @@ const sendVerificationEmail = async (payload: {
 <body>
     <div class="container">
         <div class="header">
-            <img src="../../../../public/assets/logo.png" alt="Logo">
+            <img src="/logo.png" alt="Logo">
         </div>
         <div class="content">
             <h2>Verify Your Email Address</h2>
-            <p>Hi ${payload?.name},</p>
+            <p>Hi ${name || 'there'},</p>
             <p>Thank you for signing up. To complete your registration, please verify your email address by clicking the button below:</p>
-            <a  href="${verificationlink}" class="button">Verify Email</a>
+            <a href="${verificationlink}" class="button">Verify Email</a>
            
             <p>Thank you,</p>
             <p>The FreeFexiPlan Team</p>
         </div>
         <div class="footer">
-            <p>&copy; ${currentYear}  FreeFexiPlan. All rights reserved.</p>
+            <p>&copy; ${currentYear} FreeFexiPlan. All rights reserved.</p>
         </div>
     </div>
 </body>
 </html>
-
-  `,
+    `,
   };
 
   await sendMailerHelper.sendMail(mailInfo);
