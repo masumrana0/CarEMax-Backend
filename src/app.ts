@@ -16,20 +16,11 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (
-        !origin ||
-        [
-          'https://www.freeflexiplan.com',
-          'http://localhost:3000',
-          'https://freeflexiplan.vercel.app',
-        ].indexOf(origin) !== -1
-      ) {
-        callback(null, origin);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: [
+      'https://www.freeflexiplan.com',
+      'http://localhost:3000',
+      'https://freeflexiplan.vercel.app',
+    ],
     credentials: true,
   }),
 );

@@ -42,7 +42,7 @@ router.patch(
 
 router.post('/forget-password', AuthController.forgetPassword);
 
-router.post('/reset-password/:token', AuthController.resetPassword);
+router.patch('/reset-password/:token', AuthController.resetPassword);
 
 router.post(
   '/sendVerificationEmail',

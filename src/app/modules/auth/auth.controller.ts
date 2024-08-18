@@ -89,48 +89,28 @@ const changeEmail = catchAsync(async (req: Request, res: Response) => {
 
 // ForgetPassword
 const forgetPassword = catchAsync(async (req: Request, res: Response) => {
-  const result = await AuthService.forgetPassword(req.body);
+  await AuthService.forgetPassword(req.body);
 
-  if (result && 'validationResponse' in result) {
-    // Handle validation errors
-    sendResponse<IDataValidationResponse>(res, {
-      statusCode: httpStatus.OK,
-      success: false,
-      message: 'Validation response',
-      data: result,
-    });
-  } else {
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: 'Please.Check your email!',
-      data: null,
-    });
-  }
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Please.Check your email!',
+    data: null,
+  });
 });
 
 // Reset Password
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
   const token = req.params.token;
 
-  const result = await AuthService.resetPassword(req.body, token);
+  await AuthService.resetPassword(req.body, token);
 
-  if (result && 'validationResponse' in result) {
-    // Handle validation errors
-    sendResponse<IDataValidationResponse>(res, {
-      statusCode: httpStatus.OK,
-      success: false,
-      message: 'Validation response',
-      data: result,
-    });
-  } else {
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: 'your account is  recovered!',
-      data: null,
-    });
-  }
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'your account is  recovered!',
+    data: null,
+  });
 });
 
 const sendVerificationEmail = catchAsync(
@@ -158,26 +138,15 @@ const sendVerificationEmail = catchAsync(
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const token = req.params.token;
 
-  const result = await AuthService.verifyEmail(token);
+  await AuthService.verifyEmail(token);
 
-  if (result && 'validationResponse' in result) {
-    // Handle validation errors
-    sendResponse<IDataValidationResponse>(res, {
-      statusCode: httpStatus.OK,
-      success: false,
-      message: 'Validation response',
-      data: result,
-    });
-  } else {
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: 'Congratulation.your account is Verified !',
-      data: undefined,
-    });
-  }
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Congratulation.your account is Verified !',
+    data: null,
+  });
 });
-
 export const AuthController = {
   userLogin,
   getNewAccessToken,

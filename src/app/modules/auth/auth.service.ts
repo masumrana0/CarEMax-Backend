@@ -342,9 +342,7 @@ const sendVerificationEmail = async (payload: {
 };
 
 // Reset Password
-const verifyEmail = async (
-  token: string,
-): Promise<any | IDataValidationResponse> => {
+const verifyEmail = async (token: string) => {
   // Verify the token
   const isVerified = jwtHelpers.verifyToken(
     token,
@@ -352,43 +350,47 @@ const verifyEmail = async (
   );
 
   if (!isVerified) {
-    return validationResponse('Invalid  or expired Link!. Please try again');
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'Invalid  or expired Link!. Please try again',
+    );
   }
 
   const { userId, email } = isVerified;
-  const isUserExist = User.isUserExist(email);
+  const isUserExist = await User.isUserExist(email);
   if (!isUserExist) {
-    return validationResponse('Sorry something is wrong. Please try again');
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'Sorry something is wrong. Please try again',
+    );
   }
 
+  if (isUserExist?.isEmailVerified) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'your email is already verified',
+    );
+  }
   // Update the user's password
-  const setVerifiedEmail = await User.findByIdAndUpdate(
-    { _id: userId },
-    { isEmailVerified: true },
-  );
-
-  if (!setVerifiedEmail) {
-    return validationResponse('Something is wrong. Please try again');
-  }
+  await User.findByIdAndUpdate({ _id: userId }, { isEmailVerified: true });
 };
 
 // ForgetPassword
-const forgetPassword = async (
-  payload: IForgetPassword,
-): Promise<any | IDataValidationResponse> => {
+const forgetPassword = async (payload: IForgetPassword) => {
   const { email } = payload;
   const isUserExist = await User.findOne({ email: email });
 
   // checking is user existed
   if (!isUserExist) {
-    return validationResponse('this user does not exist.');
+    throw new ApiError(httpStatus.NOT_FOUND, 'this user does not exist.');
   }
 
   const passResetToken = jwtHelpers.createResetToken(
     {
-      userId: isUserExist._id,
-      email: isUserExist.email,
-      role: isUserExist.role,
+      userId: isUserExist?._id,
+      email: isUserExist?.email,
+      password: isUserExist?.password,
+      role: isUserExist?.role,
     },
     config.jwt.tokenSecret as string,
     '5m',
@@ -460,13 +462,13 @@ const forgetPassword = async (
                 <h2>Password Reset Verification</h2>
             </div>
             <div class="content">
-               <p>Dear   ,</p>
+               <p>Dear,</p>
                 <p>We have received a request to reset the password for your account. To proceed with the password reset, click the button below:</p>
                 <p style="text-align: center;"><a href="${resetPasswordLink}" class="button">Reset Password</a></p>
                 <p>If you did not request this password reset, please ignore this message.</p>
             </div>
             <div class="footer">
-                <p>Best regards,<br>[Your Company Name]</p>
+                <p>Best regards, Freeflexiplan</p>
             </div>
         </div>
     </body>
@@ -481,7 +483,7 @@ const forgetPassword = async (
 const resetPassword = async (
   payload: { newPassword: string },
   token: string,
-): Promise<any | IDataValidationResponse> => {
+) => {
   const { newPassword } = payload;
 
   // Verify the token
@@ -491,7 +493,27 @@ const resetPassword = async (
   );
 
   if (!isVerified) {
-    validationResponse('Invalid  or expired Link!');
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Invalid or expired link. Please try reseting your password again.',
+    );
+  }
+
+  const isUserExist = await User.isUserExist(isVerified?.email);
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'user does not exist');
+  }
+
+  const isMatchPreviousPassword = await verifyPassword(
+    newPassword,
+    isUserExist.password,
+  );
+
+  if (isMatchPreviousPassword) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Please choose a different password.',
+    );
   }
 
   const { userId } = isVerified;
@@ -500,14 +522,7 @@ const resetPassword = async (
   const hashedPassword = await convertHashPassword(newPassword);
 
   // Update the user's password
-  const isUpdatePassword = await User.findByIdAndUpdate(
-    { userId },
-    { password: hashedPassword },
-  );
-
-  if (!isUpdatePassword) {
-    return validationResponse('something is wrong try again ');
-  }
+  await User.findByIdAndUpdate({ _id: userId }, { password: hashedPassword });
 };
 
 export const AuthService = {
