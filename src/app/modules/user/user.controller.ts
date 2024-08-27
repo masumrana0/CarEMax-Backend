@@ -10,7 +10,6 @@ import { userFilterableFields } from './user.constant';
 import { IUploadFile } from '../../../inerfaces/file';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
-  console.log(req.body);
   const result = await UserService.createUser(req.body);
 
   sendResponse<IUser>(res, {

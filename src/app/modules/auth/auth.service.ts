@@ -256,10 +256,6 @@ const sendVerificationEmail = async (payload: {
     '5m',
   );
 
-  const verificationlink = encodeURI(
-    `${config.verify_user_url}${passVerificationToken}`,
-  );
-
   const mailInfo = {
     to: email,
     subject: 'Secure Your Account: Verify Your Account',
@@ -306,6 +302,7 @@ const sendVerificationEmail = async (payload: {
             text-align: center;
             text-decoration: none;
             border-radius: 5px;
+            font-weight: bold;
         }
         .footer {
             text-align: center;
@@ -324,8 +321,7 @@ const sendVerificationEmail = async (payload: {
             <h2>Verify Your Email Address</h2>
             <p>Hi ${name || 'there'},</p>
             <p>Thank you for signing up. To complete your registration, please verify your email address by clicking the button below:</p>
-            <a href="${verificationlink}" class="button">Verify Email</a>
-           
+            <a href="${config.verify_user_url}${passVerificationToken}" class="button">Verify Email</a>
             <p>Thank you,</p>
             <p>The FreeFexiPlan Team</p>
         </div>
@@ -337,6 +333,7 @@ const sendVerificationEmail = async (payload: {
 </html>
     `,
   };
+  console.log('mail html content 🤣🤣🤣', mailInfo);
 
   await sendMailerHelper.sendMail(mailInfo);
 };
@@ -385,7 +382,7 @@ const forgetPassword = async (payload: IForgetPassword) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'this user does not exist.');
   }
 
-  const passResetToken = jwtHelpers.createResetToken(
+  const passResetToken = await jwtHelpers.createResetToken(
     {
       userId: isUserExist?._id,
       email: isUserExist?.email,
@@ -402,78 +399,83 @@ const forgetPassword = async (payload: IForgetPassword) => {
     to: email,
     subject: 'Secure Your Account: Reset Your Password Now',
     html: `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Password Reset Verification</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f5f5f5;
-                margin: 0;
-                padding: 0;
-            }
-            .container {
-                max-width: 600px;
-                margin: 20px auto;
-                background-color: #ffffff;
-                border-radius: 5px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            }
-            .header {
-                background-color: #007bff;
-                color: #ffffff;
-                text-align: center;
-                padding: 20px 0;
-                border-top-left-radius: 5px;
-                border-top-right-radius: 5px;
-            }
-            .content {
-                padding: 40px;
-                color: #333333;
-                font-size: 16px;
-                line-height: 1.6;
-            }
-            .button {
-                display: inline-block;
-                padding: 12px 24px;
-                background-color: #007bff;
-                color: #ffffff;
-                text-decoration: none;
-                border-radius: 5px;
-            }
-            .footer {
-                margin-top: 20px;
-                text-align: center;
-                font-size: 14px;
-                color: #666666;
-                padding: 20px;
-                border-bottom-left-radius: 5px;
-                border-bottom-right-radius: 5px;
-                background-color: #f0f0f0;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h2>Password Reset Verification</h2>
-            </div>
-            <div class="content">
-               <p>Dear,</p>
-                <p>We have received a request to reset the password for your account. To proceed with the password reset, click the button below:</p>
-                <p style="text-align: center;"><a href="${resetPasswordLink}" class="button">Reset Password</a></p>
-                <p>If you did not request this password reset, please ignore this message.</p>
-            </div>
-            <div class="footer">
-                <p>Best regards, Freeflexiplan</p>
-            </div>
-        </div>
-    </body>
-    </html>
-  `,
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Password Reset Verification</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  background-color: #f5f5f5;
+                  margin: 0;
+                  padding: 0;
+              }
+              .container {
+                  max-width: 600px;
+                  margin: 20px auto;
+                  background-color: #ffffff;
+                  border-radius: 5px;
+                  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+              }
+              .header {
+                  background-color: #007bff;
+                  color: #ffffff;
+                  text-align: center;
+                  padding: 20px 0;
+                  border-top-left-radius: 5px;
+                  border-top-right-radius: 5px;
+              }
+              .content {
+                  padding: 40px;
+                  color: #333333;
+                  font-size: 16px;
+                  line-height: 1.6;
+              }
+              .button {
+                  display: block;
+                  width: 100%;
+                  max-width: 200px;
+                  margin: 20px auto;
+                  padding: 12px 24px;
+                  background-color: #007bff;
+                  color: #ffffff;
+                  text-decoration: none;
+                  text-align: center;
+                  border-radius: 5px;
+                  font-weight: bold;
+              }
+              .footer {
+                  margin-top: 20px;
+                  text-align: center;
+                  font-size: 14px;
+                  color: #666666;
+                  padding: 20px;
+                  border-bottom-left-radius: 5px;
+                  border-bottom-right-radius: 5px;
+                  background-color: #f0f0f0;
+              }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <div class="header">
+                  <h2>Password Reset Verification</h2>
+              </div>
+              <div class="content">
+                  <p>Dear,</p>
+                  <p>We have received a request to reset the password for your account. To proceed with the password reset, click the button below:</p>
+                  <a href="${resetPasswordLink}" class="button">Reset Password</a>
+                  <p>If you did not request this password reset, please ignore this message.</p>
+              </div>
+              <div class="footer">
+                  <p>Best regards, Freeflexiplan</p>
+              </div>
+          </div>
+      </body>
+      </html>
+    `,
   };
 
   await sendMailerHelper.sendMail(mailInfo);
@@ -487,7 +489,7 @@ const resetPassword = async (
   const { newPassword } = payload;
 
   // Verify the token
-  const isVerified = jwtHelpers.verifyToken(
+  const isVerified = await jwtHelpers.verifyToken(
     token,
     config.jwt.tokenSecret as string,
   );
