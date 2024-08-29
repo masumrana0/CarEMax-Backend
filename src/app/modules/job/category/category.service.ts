@@ -1,5 +1,7 @@
+import ApiError from '../../../../errors/ApiError';
 import { IJobCategory } from './category.interface';
 import { JobCategory } from './category.model';
+import httpStatus from 'http-status';
 
 // Create a new job category
 const createJobCategory = async (
@@ -35,7 +37,31 @@ const updateJobCategory = async (
 
 // Delete a job category
 const deleteJobCategory = async (id: string): Promise<IJobCategory | null> => {
+  const isExistJobcategory = await JobCategory.findById(id).exec();
+  if (!isExistJobcategory) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Job Category not found');
+  }
   const result = await JobCategory.findByIdAndDelete(id).exec();
+  return result;
+};
+
+// Delete a Sub Category
+const deleteSubCategory = async (
+  categoryId: string,
+  subOptionId: string,
+): Promise<IJobCategory | null> => {
+  const isExistJobCategory = await JobCategory.findById(categoryId).exec();
+  if (!isExistJobCategory) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Job Category not found');
+  }
+
+  // Remove the subOption with the specified ID from the subOption array
+  const result = await JobCategory.findByIdAndUpdate(
+    categoryId,
+    { $pull: { subOption: { _id: subOptionId } } },
+    { new: true },
+  ).exec();
+
   return result;
 };
 
@@ -45,4 +71,5 @@ export const jobCategoryService = {
   getJobCategoryById,
   updateJobCategory,
   deleteJobCategory,
+  deleteSubCategory,
 };

@@ -30,7 +30,7 @@ const UserSchema = new Schema<IUser, UserModel>(
     password: {
       type: String,
       required: true,
-      select: 0,
+      select: false,
     },
     email: {
       type: String,
@@ -49,11 +49,29 @@ const UserSchema = new Schema<IUser, UserModel>(
       enum: ['free', 'paid'],
       default: 'free',
     },
-
-    balance: {
+    mainBalance: {
       type: Number,
       required: true,
       default: 0,
+    },
+    earningBalance: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    rechargeEarningBalance: {
+      type: Number,
+      // eslint-disable-next-line no-unused-vars
+      required: function (this: IUser) {
+        // Add type annotation for 'this'
+        return this.role === 'customer' && this.accountType === 'business';
+      },
+      // eslint-disable-next-line no-unused-vars
+      default: function (this: IUser) {
+        // Add type annotation for 'this'
+        const is = this.role === 'customer' && this.accountType === 'business';
+        return is ? 0 : undefined;
+      },
     },
     documents: {
       type: [String],

@@ -27,6 +27,12 @@ router.patch(
 
 // Delete job category
 router.delete(
+  '/delete-subCategory',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  jobCategoryController.deleteJobSubCategory,
+);
+// Delete job category
+router.delete(
   '/:id',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   jobCategoryController.deleteJobCategory,

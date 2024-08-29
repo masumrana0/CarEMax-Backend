@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { IUser } from '../user/user.interface';
+import { IJobCategory } from './category/category.interface';
 
 type IDoc = {
   isRejected?: boolean;
@@ -11,15 +12,19 @@ export type IJob = {
   jobTitle: string;
   description: string;
   region: string;
-  category: string;
+  category: {
+    _id: string | Types.ObjectId | IJobCategory;
+    title: string;
+  };
   subCategory: string;
   steps: string[];
   workerNeeded: number;
-  compleateJob?: number;
+  completedJob?: number;
   workerEarn: number;
   showInterval: string;
   thumbnail?: string;
   doc?: IDoc;
+  proofType: 'screenshot proof' | 'text proof';
 };
 
 export type IJobFilters = {

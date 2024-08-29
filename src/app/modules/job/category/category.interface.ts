@@ -5,5 +5,5 @@ export type IJobCategory = {
     label: string;
     value: string;
     minCost: number;
-  };
+  }[];
 };

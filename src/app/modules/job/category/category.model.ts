@@ -12,20 +12,22 @@ const JobCategorySchema = new Schema<IJobCategory>({
     required: true,
   },
   subOption: {
-    type: {
-      label: {
-        type: String,
-        required: true,
+    type: [
+      {
+        label: {
+          type: String,
+          required: true,
+        },
+        value: {
+          type: String,
+          required: true,
+        },
+        minCost: {
+          type: Number,
+          required: true,
+        },
       },
-      value: {
-        type: String,
-        required: true,
-      },
-      minCost: {
-        type: Number,
-        required: true,
-      },
-    },
+    ],
     required: true,
   },
 });

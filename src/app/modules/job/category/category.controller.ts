@@ -82,14 +82,6 @@ const deleteJobCategory = catchAsync(async (req: Request, res: Response) => {
   const jobCategoryId = req.params.id;
 
   const result = await jobCategoryService.deleteJobCategory(jobCategoryId);
-  if (!result) {
-    return sendResponse<null>(res, {
-      statusCode: httpStatus.NOT_FOUND,
-      success: false,
-      message: 'Job category not found',
-      data: null,
-    });
-  }
 
   sendResponse<IJobCategory>(res, {
     statusCode: httpStatus.OK,
@@ -99,9 +91,26 @@ const deleteJobCategory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteJobSubCategory = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
+
+  const result = await jobCategoryService.deleteSubCategory(
+    query.categoryId as string,
+    query.subOptionId as string,
+  );
+
+  sendResponse<IJobCategory>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Job sub category deleted successfully!',
+    data: result,
+  });
+});
+
 export const jobCategoryController = {
   createJobCategory,
   getAllJobCategories,
+  deleteJobSubCategory,
   getJobCategoryById,
   updateJobCategory,
   deleteJobCategory,

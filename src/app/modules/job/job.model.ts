@@ -21,8 +21,15 @@ const JobSchema = new Schema<IJob>(
       required: true,
     },
     category: {
-      type: String,
-      required: true,
+      _id: {
+        type: Types.ObjectId,
+        required: true,
+        ref: 'JobCategory',
+      },
+      title: {
+        type: String,
+        required: true,
+      },
     },
     subCategory: {
       type: String,
@@ -36,7 +43,7 @@ const JobSchema = new Schema<IJob>(
       type: Number,
       required: true,
     },
-    compleateJob: {
+    completedJob: {
       type: Number,
       default: 0,
     },
@@ -52,10 +59,15 @@ const JobSchema = new Schema<IJob>(
       type: String,
       required: true,
     },
+    proofType: {
+      type: String, // Added type to proofType
+      enum: ['screenshot proof', 'text proof'],
+      required: true,
+    },
     doc: {
       type: {
         isRejected: { type: Boolean, default: false },
-        rejectedResion: { type: String },
+        rejectedReason: { type: String }, // Fixed typo from 'rejectedResion'
       },
       required: false,
     },
