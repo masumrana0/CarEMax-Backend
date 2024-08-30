@@ -24,7 +24,10 @@ export type IJob = {
   showInterval: string;
   thumbnail?: string;
   doc?: IDoc;
-  proofType: 'screenshot proof' | 'text proof';
+  proofType: {
+    title: string;
+    type: 'screenshot proof' | 'text proof';
+  }[];
 };
 
 export type IJobFilters = {

@@ -12,6 +12,7 @@ import { pendingJobRoutes } from '../modules/job/pending-job/job.route';
 import { rejectedJobRoutes } from '../modules/job/reject-job/job.route';
 import { RunningJobRoutes } from '../modules/job/running-job/job.route';
 import { jobCategoryRoute } from '../modules/job/category/category.route';
+import { jobOfWorkRoute } from '../modules/job/JobOfWork/JobOfWork.route';
 
 const router = express.Router();
 
@@ -47,6 +48,10 @@ const moduleRoutes = [
   {
     path: '/job',
     route: JobRoutes,
+  },
+  {
+    path: '/jobofwork',
+    route: jobOfWorkRoute,
   },
   {
     path: '/running-job',

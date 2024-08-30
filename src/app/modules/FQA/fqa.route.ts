@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post(
   '/',
-  FileUploadHelper.upload.array('file'),
+  FileUploadHelper.upload.array('files'),
   testingUploadController.uploadFile,
 );
 

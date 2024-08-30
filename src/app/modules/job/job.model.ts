@@ -59,15 +59,20 @@ const JobSchema = new Schema<IJob>(
       type: String,
       required: true,
     },
-    proofType: {
-      type: String, // Added type to proofType
-      enum: ['screenshot proof', 'text proof'],
-      required: true,
-    },
+    proofType: [
+      {
+        title: { type: String, required: true },
+        type: {
+          type: String,
+          enum: ['screenshot proof', 'text proof'],
+          required: true,
+        },
+      },
+    ],
     doc: {
       type: {
         isRejected: { type: Boolean, default: false },
-        rejectedReason: { type: String }, // Fixed typo from 'rejectedResion'
+        rejectedReason: { type: String },
       },
       required: false,
     },
