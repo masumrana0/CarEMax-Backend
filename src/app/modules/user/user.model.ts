@@ -8,73 +8,33 @@
 
 import { Schema, model } from 'mongoose';
 import { IUser, UserModel } from './user.interface';
-import { userRole } from './user.constant';
 import bcrypt from 'bcrypt';
 import { convertHashPassword } from '../../../helper/passwordSecurityHelper';
 
-const UserSchema = new Schema<IUser, UserModel>(
+const UserSchema = new Schema<IUser>(
   {
     name: {
+      firstName: { type: String, required: true },
+      lastName: { type: String }, // Optional lastName
+    },
+    phoneNumber: {
       type: String,
       required: true,
-    },
-    contactNo: {
-      type: String,
-      required: true,
-    },
-    role: {
-      type: String,
-      enum: userRole,
-      default: 'customer',
-    },
-    password: {
-      type: String,
-      required: true,
-      select: false,
     },
     email: {
       type: String,
       required: true,
       unique: true,
     },
-    accountType: {
+    password: {
       type: String,
-      enum: ['personal', 'business'],
-      required: function () {
-        return this.role === 'customer';
-      },
+      required: true,
+      select: false, // Prevents password from being returned in queries by default
     },
-    membership: {
+    role: {
       type: String,
-      enum: ['free', 'paid'],
-      default: 'free',
-    },
-    mainBalance: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
-    earningBalance: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
-    rechargeEarningBalance: {
-      type: Number,
-      // eslint-disable-next-line no-unused-vars
-      required: function (this: IUser) {
-        // Add type annotation for 'this'
-        return this.role === 'customer' && this.accountType === 'business';
-      },
-      // eslint-disable-next-line no-unused-vars
-      default: function (this: IUser) {
-        // Add type annotation for 'this'
-        const is = this.role === 'customer' && this.accountType === 'business';
-        return is ? 0 : undefined;
-      },
-    },
-    documents: {
-      type: [String],
+      enum: ['customer', 'admin', 'super_admin'],
+      default: 'customer', // Default to 'customer' if not provided
     },
     profilePhoto: {
       type: String,
@@ -82,19 +42,17 @@ const UserSchema = new Schema<IUser, UserModel>(
     passwordChangedAt: {
       type: Date,
     },
-    isEmailVerified: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
     isVerified: {
       type: Boolean,
-      default: false,
+      default: false, // Default to false if not provided
     },
   },
   {
     timestamps: true,
     toJSON: {
+      virtuals: true,
+    },
+    toObject: {
       virtuals: true,
     },
   },

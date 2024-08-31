@@ -47,7 +47,7 @@ const userLogin = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   }
 
   // Destructure user details
-  const { _id, role, email: Email, isEmailVerified, accountType } = isUserExist;
+  const { _id, role, email: Email } = isUserExist;
 
   // Create the accessToken payload
   const accessTokenPayload: Record<string, any> = {
@@ -57,9 +57,6 @@ const userLogin = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   };
 
   // Conditionally add accountType if role is 'customer'
-  if (role === 'customer') {
-    accessTokenPayload.accountType = accountType;
-  }
 
   // Create accessToken
   const accessToken = jwtHelpers.createToken(
@@ -76,9 +73,6 @@ const userLogin = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   };
 
   // Conditionally add accountType if role is 'customer'
-  if (role === 'customer') {
-    refreshTokenPayload.accountType = accountType;
-  }
 
   // Create refreshToken
   const refreshToken = jwtHelpers.createToken(
@@ -90,7 +84,6 @@ const userLogin = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   return {
     accessToken,
     refreshToken,
-    isEmailVerified,
   };
 };
 // refresh Token
@@ -227,7 +220,7 @@ const changeEmail = async (
 
   // Send verification email to the new email address
   await sendVerificationEmail({
-    name: updatedUser?.name,
+    name: updatedUser?.name.firstName,
     email: updatedUser?.email,
   });
 
@@ -341,19 +334,19 @@ const sendVerificationEmail = async (payload: {
 // Reset Password
 const verifyEmail = async (token: string) => {
   // Verify the token
-  const isVerified = jwtHelpers.verifyToken(
+  const isTokenVerified = jwtHelpers.verifyToken(
     token,
     config.jwt.tokenSecret as string,
   );
 
-  if (!isVerified) {
+  if (!isTokenVerified) {
     throw new ApiError(
       httpStatus.FORBIDDEN,
       'Invalid  or expired Link!. Please try again',
     );
   }
 
-  const { userId, email } = isVerified;
+  const { userId, email } = isTokenVerified;
   const isUserExist = await User.isUserExist(email);
   if (!isUserExist) {
     throw new ApiError(
@@ -362,14 +355,14 @@ const verifyEmail = async (token: string) => {
     );
   }
 
-  if (isUserExist?.isEmailVerified) {
+  if (isUserExist?.isVerified) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       'your email is already verified',
     );
   }
   // Update the user's password
-  await User.findByIdAndUpdate({ _id: userId }, { isEmailVerified: true });
+  await User.findByIdAndUpdate({ _id: userId }, { isVerified: true });
 };
 
 // ForgetPassword

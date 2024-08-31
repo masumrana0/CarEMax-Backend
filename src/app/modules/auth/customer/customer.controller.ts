@@ -17,6 +17,7 @@ import { CustomerService } from './customer.service';
 // customer registration with login
 const customerRegistration = catchAsync(async (req: Request, res: Response) => {
   const { ...userData } = req.body;
+  console.log(userData);
   // await AuthService.sendEmailVerificationMail(userData.email);
   const result = await CustomerService.customerRegistration(userData);
 

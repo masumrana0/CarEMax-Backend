@@ -28,10 +28,6 @@ const customerRegistration = async (
     );
   }
 
-  if (!payload.name) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'name is required');
-  }
-
   const session = await startSession();
   session.startTransaction();
 
@@ -41,7 +37,7 @@ const customerRegistration = async (
 
     await AuthService.sendVerificationEmail({
       email: user?.email,
-      name: user?.name as string,
+      name: user?.name.firstName as string,
     });
 
     // Login User

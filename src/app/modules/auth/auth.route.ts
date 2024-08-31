@@ -4,6 +4,7 @@ import { authValidationSchema } from './auth.validation';
 import { AuthController } from './auth.controller';
 import auth from '../../middlewares/auth';
 import { ENUM_USER_ROLE } from '../../../enums/role';
+import { CustomerController } from './customer/customer.controller';
 
 const router = express.Router();
 
@@ -11,6 +12,12 @@ router.post(
   '/login',
   validateRequest(authValidationSchema.userLoginZodSchema),
   AuthController.userLogin,
+);
+
+router.post(
+  '/customer/register',
+  // validateRequest(authValidationSchema.customerRegisterZodSchema),
+  CustomerController.customerRegistration,
 );
 
 router.post(
